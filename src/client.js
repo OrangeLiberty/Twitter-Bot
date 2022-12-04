@@ -1,6 +1,5 @@
 //Module Import
-require('dotenv').config();
-
+require("dotenv").config();
 
 //Create a config for the Twit instance
 module.exports = {
@@ -10,5 +9,5 @@ module.exports = {
     access_token_secret: process.env.ACCESSSECRET,
     timeout_ms: 60 * 1000, // optional HTTP request timeout to apply to all requests.
     strictSSL: true, // optional - requires SSL certificates to be valid.
-    character_limit: 240
-}
+    character_limit: 240,
+};

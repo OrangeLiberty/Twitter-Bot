@@ -81,8 +81,6 @@ function postQuote(quote) {
     );
 }
 
-postRandomQuote();
-
 //Set up user stream
 var stream = bot.stream("user");
 
@@ -96,22 +94,19 @@ function tweetEvent(eventMsg) {
     console.log("tweetIt");
     tweetIt(replyTweet);
 }
-/* if (replyTo === "satoshisquote") {
-    var replyTweet = "@" + fromUser + ""
-} */
 
 function tweetIt(txt) {
-    /* var newTweet = {
-                                status: txt
-                            } */
+    var newTweet = {
+        status: txt,
+    };
     console.log("Status Update");
-    bot.post("statuses/update", { status: txt }, tweeted);
+    bot.post("statuses/update", { status: newTweet }, tweeted);
 
     function tweeted(err, data, response) {
         if (err) {
             console.log("Something went wrong");
         } else {
-            console.log("It Worked");
+            console.log("It worked");
         }
     }
 }
