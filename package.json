@@ -1,0 +1,16 @@
+{
+    "name": "satoshisquote",
+    "version": "0.0.1",
+    "description": "Twitter bot posting quotes by Satoshi Nakamoto",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js"
+    },
+    "author": "OrangeLiberty",
+    "license": "MIT",
+    "dependencies": {
+        "cron": "^2.1.0",
+        "dotenv": "^16.0.3",
+        "twit": "^2.2.11"
+    }
+}
