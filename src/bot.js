@@ -1,3 +1,4 @@
+"use strict";
 console.log("The Bot is running");
 
 //Module import
@@ -79,36 +80,6 @@ function postQuote(quote) {
             }
         }
     );
-}
-
-//Set up user stream
-var stream = bot.stream("user");
-
-stream.on("follow", tweetEvent);
-
-function tweetEvent(eventMsg) {
-    var replyTo = eventMsg.in_reply_to_screen_name;
-    var tweetText = eventMsg.text;
-    var fromUser = eventMsg.user.screen_name;
-    var replyTweet = "@" + fromUser + " thank you for following me!";
-    console.log("tweetIt");
-    tweetIt(replyTweet);
-}
-
-function tweetIt(txt) {
-    var newTweet = {
-        status: txt,
-    };
-    console.log("Status Update");
-    bot.post("statuses/update", { status: newTweet }, tweeted);
-
-    function tweeted(err, data, response) {
-        if (err) {
-            console.log("Something went wrong");
-        } else {
-            console.log("It worked");
-        }
-    }
 }
 
 module.exports.postRandomQuote = postRandomQuote;

@@ -1,3 +1,4 @@
+"use strict";
 //Module Import
 require("dotenv").config();
 
