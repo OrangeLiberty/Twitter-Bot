@@ -82,4 +82,4 @@ function postQuote(quote) {
     );
 }
 
-module.exports.postRandomQuote = postRandomQuote;
+module.exports = postRandomQuote;
