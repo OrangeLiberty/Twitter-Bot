@@ -2,6 +2,7 @@
 console.log("The Bot is running");
 
 //Module import
+require("dotenv").config();
 //Twit
 const Twit = require("twit");
 //Client Config
@@ -12,12 +13,20 @@ const quotes = require("./quotes.json");
 //New Twitter Bot
 const bot = new Twit(client);
 
+const express = require("express");
+
+const app = express();
+
+const port = process.env.PORT;
+
+const tweetInterval = 3 * 60 * 60 * 1000;
+
 function postRandomQuote() {
     //Get a random quote
     var quote = quotes[Math.floor(Math.random() * quotes.length)];
 
     //Get date
-    var quoteDate = quote.date;
+    var quoteDate = quote.date + "\n" + "#bitcoin";
 
     //replace the satoshi-whitespace-oddness
     var cleanQuote = cleanFunction(quote);
@@ -82,4 +91,15 @@ function postQuote(quote) {
     );
 }
 
-module.exports = postRandomQuote;
+app.all("/", (req, res) => {
+    console.log("Just a request");
+    res.send("placeholder");
+});
+
+postRandomQuote();
+
+setInterval(postRandomQuote, tweetInterval);
+
+app.listen(port || 3000, () => {
+    console.log(`Server is running on port ${port}`);
+});
