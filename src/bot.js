@@ -93,7 +93,7 @@ function postQuote(quote) {
 
 app.all("/", (req, res) => {
     console.log("Just a request");
-    res.send("placeholder");
+    res.send("https: //twitter.com/satoshisquote");
 });
 
 postRandomQuote();
