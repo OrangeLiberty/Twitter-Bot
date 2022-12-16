@@ -1,13 +1,12 @@
-"use strict";
 console.log("The Bot is running");
-
 //Module import
 require("dotenv").config();
 //Twit
 const Twit = require("twit");
 //Client Config
 const client = require("./client");
-
+//node-schedule
+const schedule = require("node-schedule");
 //Quotes from Satoshi
 const quotes = require("./quotes.json");
 //New Twitter Bot
@@ -18,8 +17,6 @@ const express = require("express");
 const app = express();
 
 const port = process.env.PORT;
-
-const tweetInterval = 3 * 60 * 60 * 1000;
 
 function postRandomQuote() {
     //Get a random quote
@@ -86,19 +83,29 @@ function postQuote(quote) {
                 console.log(err);
             } else {
                 console.log(data);
+                console.log("SUCCESS: Quote sent");
             }
         }
     );
 }
 
-app.all("/", (req, res) => {
+app.get("/", (req, res) => {
     console.log("Just a request");
     res.send("https: //twitter.com/satoshisquote");
 });
 
 postRandomQuote();
 
-setInterval(postRandomQuote, tweetInterval);
+// Use cron-job to schedule tweet
+const rule = new schedule.RecurrenceRule();
+rule.dayOfWeek = [0, new schedule.Range(1, 6)];
+rule.hour = [0, new schedule.Range(6, 21, 3)];
+rule.minute = 0;
+
+schedule.scheduleJob(rule, () => {
+    console.log("Cron Job runs successfully");
+    postRandomQuote();
+});
 
 app.listen(port || 3000, () => {
     console.log(`Server is running on port ${port}`);
