@@ -1,3 +1,4 @@
 .env
-
+.gitignore
+auth.txt
 node_modules
