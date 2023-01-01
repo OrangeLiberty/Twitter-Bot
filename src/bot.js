@@ -10,7 +10,7 @@ const schedule = require("node-schedule");
 //Quotes from Satoshi
 const quotes = require("./quotes.json");
 //New Twitter Bot
-const bot = new Twit(client);
+const bot = new Twit(client.twitterKeys);
 
 const express = require("express");
 
@@ -19,79 +19,98 @@ const app = express();
 const port = process.env.PORT;
 
 function postRandomQuote() {
-    //Get a random quote
-    var quote = quotes[Math.floor(Math.random() * quotes.length)];
+  const params = {
+    q: client.query,
+    result_type: client.result_type,
+    lang: client.lang,
+    tweet_mode: "extended",
+    count: 5,
+  };
 
-    //Get date
-    var quoteDate = quote.date + "\n" + "#bitcoin";
+  bot.get("search/tweets", params, (err, data, res) => {
+    if (!err) {
+      console.log(`Data: ${data}`);
+      console.log(`Response: ${res}`);
 
-    //replace the satoshi-whitespace-oddness
-    var cleanQuote = cleanFunction(quote);
+      //Get a random quote
+      var quote = quotes[Math.floor(Math.random() * quotes.length)];
 
-    //Cut the quote to fit
-    var shortedQuote = shortFunction(cleanQuote);
+      //Get date
+      var quoteDate = quote.date + "\n" + "#bitcoin";
 
-    //Match the quote and the quotedate
-    var quoteRdy = shortedQuote + quoteDate;
+      //replace the satoshi-whitespace-oddness
+      var cleanQuote = cleanFunction(quote);
 
-    //Post to twitter
-    postQuote(quoteRdy);
+      //Cut the quote to fit
+      var shortedQuote = shortFunction(cleanQuote);
+
+      //Match the quote and the quotedate
+      var quoteRdy = shortedQuote + quoteDate;
+
+      //Post to twitter
+      postQuote(quoteRdy);
+    } else {
+      console.log(`ERROR: ${err}`);
+    }
+  });
 }
 //Clean whitespace
 function cleanFunction(quote) {
-    return quote.text.replace(/  /g, " ");
+  return quote.text.replace(/  /g, " ");
 }
 
 //Cut the quote to fit post
 function shortFunction(quote) {
-    if (quote.length < client.character_limit) {
-        return quote + "\n" + "Satoshi Nakamoto, ";
+  if (quote.length < client.character_limit) {
+    return quote + "\n" + "Satoshi Nakamoto, ";
+  }
+
+  var shortQuote = quote;
+  var quoteSentence = quote.match(/[^\.!\?]+[\.!\?]+/g);
+  //console.log(quoteSentence);
+
+  if (quoteSentence) {
+    var index = quoteSentence.length;
+    while (index--) {
+      if (quoteSentence.join("").length > client.twitterKeys.character_limit) {
+        quoteSentence.splice(index, 1);
+      }
+      shortQuote = quoteSentence.join("");
     }
+  }
 
-    var shortQuote = quote;
-    var quoteSentence = quote.match(/[^\.!\?]+[\.!\?]+/g);
-    //console.log(quoteSentence);
+  if (shortQuote.length > client.character_limit || shortQuote === "") {
+    return (
+      quote.substring(0, client.character_limit) +
+      "..." +
+      "\n" +
+      "Satoshi Nakamoto, "
+    );
+  }
 
-    if (quoteSentence) {
-        var index = quoteSentence.length;
-        while (index--) {
-            if (quoteSentence.join("").length > client.character_limit) {
-                quoteSentence.splice(index, 1);
-            }
-            shortQuote = quoteSentence.join("");
-        }
-    }
-
-    if (shortQuote.length > client.character_limit || shortQuote === "") {
-        return (
-            quote.substring(0, client.character_limit) +
-            "..." +
-            "\n" +
-            "Satoshi Nakamoto, "
-        );
-    }
-
-    return shortQuote + "\n" + "Satoshi Nakamoto, ";
+  return shortQuote + "\n" + "Satoshi Nakamoto, ";
 }
 
 //Post the quote to twitter
 function postQuote(quote) {
-    bot.post(
-        "statuses/update", { status: quote },
-        function(err, data, response) {
-            if (err) {
-                console.log(err);
-            } else {
-                console.log(data);
-                console.log("SUCCESS: Quote sent");
-            }
-        }
-    );
+  bot.post(
+    "statuses/update",
+    { status: quote },
+    function (err, data, response) {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log(data);
+        console.log("SUCCESS: Quote sent");
+      }
+    }
+  );
 }
 
 app.get("/", (req, res) => {
-    console.log("Just a request");
-    res.send("https: //twitter.com/satoshisquote");
+  console.log("Just a request");
+  res.location(`https: //twitter.com/${client.twitterConfig.username}`);
+  res.end();
 });
 
 postRandomQuote();
@@ -103,10 +122,10 @@ rule.hour = [0, new schedule.Range(6, 21, 3)];
 rule.minute = 0;
 
 schedule.scheduleJob(rule, () => {
-    console.log("Cron Job runs successfully");
-    postRandomQuote();
+  console.log("Cron Job runs successfully");
+  postRandomQuote();
 });
 
 app.listen(port || 3000, () => {
-    console.log(`Server is running on port ${port}`);
+  console.log(`Server is running on port ${port}`);
 });
