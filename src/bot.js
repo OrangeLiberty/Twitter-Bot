@@ -18,7 +18,7 @@ const app = express();
 
 const port = process.env.PORT;
 
-function postRandomQuote() {
+async function postRandomQuote() {
     const params = {
         q: client.query,
         result_type: client.result_type,
@@ -95,7 +95,7 @@ function shortFunction(quote) {
 }
 
 //Post the quote to twitter
-function postQuote(quote) {
+async function postQuote(quote) {
     try {
         bot.post(
             "statuses/update", { status: quote },
